@@ -103,3 +103,13 @@ output "data_factory_name" {
   description = "Data Factory name"
   value       = azurerm_data_factory.adf.name
 }
+
+output "powerbi_embedded_name" {
+  description = "Power BI Embedded capacity name"
+  value       = azurerm_powerbi_embedded.powerbi.name
+}
+
+output "powerbi_embedded_id" {
+  description = "Power BI Embedded capacity ID"
+  value       = azurerm_powerbi_embedded.powerbi.id
+}

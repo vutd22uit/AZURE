@@ -378,3 +378,16 @@ resource "azurerm_data_factory_linked_service_cosmosdb" "cosmos" {
   account_key       = azurerm_cosmosdb_account.cosmos.primary_key
   database          = azurerm_cosmosdb_sql_database.orders_db.name
 }
+
+# Power BI Embedded Capacity
+resource "azurerm_powerbi_embedded" "powerbi" {
+  name                = "${var.project_name}-powerbi"
+  location            = azurerm_resource_group.ecommerce.location
+  resource_group_name = azurerm_resource_group.ecommerce.name
+  sku                 = var.powerbi_sku
+  administrators      = var.powerbi_admins
+
+  tags = {
+    Environment = var.environment
+  }
+}
