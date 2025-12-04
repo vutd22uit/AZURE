@@ -37,6 +37,10 @@ function Header() {
                   )}
                 </Link>
 
+                <Link to="/analytics" className="hover:text-blue-200">
+                  Analytics
+                </Link>
+
                 <div className="flex items-center space-x-4">
                   <span className="text-sm">Hello, {user?.name}</span>
                   <button
