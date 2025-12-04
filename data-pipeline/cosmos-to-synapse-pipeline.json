@@ -1,0 +1,57 @@
+{
+  "name": "CosmosDB-to-Synapse-ETL",
+  "properties": {
+    "activities": [
+      {
+        "name": "CopyOrdersFromCosmos",
+        "type": "Copy",
+        "inputs": [
+          {
+            "referenceName": "CosmosDBOrdersDataset",
+            "type": "DatasetReference"
+          }
+        ],
+        "outputs": [
+          {
+            "referenceName": "SynapseOrdersDataset",
+            "type": "DatasetReference"
+          }
+        ],
+        "typeProperties": {
+          "source": {
+            "type": "CosmosDbSqlApiSource",
+            "query": "SELECT * FROM c WHERE c._ts > @{formatDateTime(adddays(utcnow(), -1), 'yyyy-MM-dd')}",
+            "preferredRegions": []
+          },
+          "sink": {
+            "type": "SqlDWSink",
+            "preCopyScript": "TRUNCATE TABLE staging.Orders",
+            "writeBehavior": "Insert"
+          },
+          "enableStaging": false
+        }
+      },
+      {
+        "name": "TransformAndAggregate",
+        "type": "SqlServerStoredProcedure",
+        "dependsOn": [
+          {
+            "activity": "CopyOrdersFromCosmos",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[sp_TransformOrders]"
+        },
+        "linkedServiceName": {
+          "referenceName": "SynapseLinkedService",
+          "type": "LinkedServiceReference"
+        }
+      }
+    ],
+    "parameters": {},
+    "folder": {
+      "name": "ETL"
+    }
+  }
+}

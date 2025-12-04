@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  labels:
+    app: order-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+      - name: order-service
+        image: ${ACR_LOGIN_SERVER}/order-service:${IMAGE_TAG}
+        ports:
+        - containerPort: 3002
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3002"
+        - name: COSMOS_DB_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: order-service-secrets
+              key: cosmos-endpoint
+        - name: COSMOS_DB_KEY
+          valueFrom:
+            secretKeyRef:
+              name: order-service-secrets
+              key: cosmos-key
+        - name: COSMOS_DB_DATABASE
+          value: "ordersdb"
+        - name: AUTH_SERVICE_URL
+          value: "http://auth-service:3001"
+        - name: PAYMENT_FUNCTION_URL
+          valueFrom:
+            secretKeyRef:
+              name: order-service-secrets
+              key: payment-function-url
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 10
+          periodSeconds: 5

@@ -1,0 +1,14 @@
+{
+  "name": "email-notification",
+  "version": "1.0.0",
+  "description": "Azure Function for sending email notifications",
+  "main": "index.js",
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^7.7.0"
+  },
+  "devDependencies": {}
+}

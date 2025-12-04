@@ -1,0 +1,254 @@
+trigger:
+  branches:
+    include:
+    - main
+    - develop
+  paths:
+    exclude:
+    - docs/*
+    - README.md
+
+variables:
+  dockerRegistryServiceConnection: 'ACR-Service-Connection'
+  imageRepository: 'ecommerce'
+  containerRegistry: '$(ACR_LOGIN_SERVER)'
+  dockerfilePath: '$(Build.SourcesDirectory)'
+  tag: '$(Build.BuildId)'
+  kubernetesServiceConnection: 'AKS-Service-Connection'
+  aksResourceGroup: 'ecommerce-cloud-rg'
+  aksClusterName: 'ecommerce-cloud-aks'
+
+stages:
+- stage: Build
+  displayName: 'Build Docker Images'
+  jobs:
+  - job: BuildImages
+    displayName: 'Build and Push Docker Images'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: Docker@2
+      displayName: 'Build Auth Service Image'
+      inputs:
+        command: buildAndPush
+        repository: 'auth-service'
+        dockerfile: '$(dockerfilePath)/auth-service/Dockerfile'
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          latest
+
+    - task: Docker@2
+      displayName: 'Build Order Service Image'
+      inputs:
+        command: buildAndPush
+        repository: 'order-service'
+        dockerfile: '$(dockerfilePath)/order-service/Dockerfile'
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          latest
+
+    - task: Docker@2
+      displayName: 'Build Frontend Image'
+      inputs:
+        command: buildAndPush
+        repository: 'frontend'
+        dockerfile: '$(dockerfilePath)/frontend/Dockerfile'
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          latest
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Kubernetes Manifests'
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/kubernetes'
+        ArtifactName: 'manifests'
+
+- stage: Test
+  displayName: 'Run Tests'
+  dependsOn: Build
+  jobs:
+  - job: UnitTests
+    displayName: 'Unit Tests'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'
+      displayName: 'Install Node.js'
+
+    - script: |
+        cd auth-service
+        npm install
+        npm test
+      displayName: 'Auth Service Tests'
+      continueOnError: true
+
+    - script: |
+        cd order-service
+        npm install
+        npm test
+      displayName: 'Order Service Tests'
+      continueOnError: true
+
+  - job: IntegrationTests
+    displayName: 'Integration Tests'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - script: |
+        echo "Running integration tests..."
+        # Add integration test commands here
+      displayName: 'Integration Tests'
+
+- stage: DeployGreen
+  displayName: 'Deploy to Green Environment'
+  dependsOn: Test
+  condition: succeeded()
+  jobs:
+  - deployment: DeployGreen
+    displayName: 'Deploy Green Version'
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'manifests'
+              downloadPath: '$(System.ArtifactsDirectory)'
+
+          - task: Kubernetes@1
+            displayName: 'Deploy Green - Order Service'
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: $(kubernetesServiceConnection)
+              namespace: 'default'
+              command: 'apply'
+              useConfigurationFile: true
+              configuration: '$(System.ArtifactsDirectory)/manifests/blue-green/green-deployment.yaml'
+
+          - script: |
+              echo "Waiting for green pods to be ready..."
+              kubectl wait --for=condition=ready pod -l version=green --timeout=300s
+            displayName: 'Wait for Green Pods'
+
+- stage: HealthCheck
+  displayName: 'Health Check on Green'
+  dependsOn: DeployGreen
+  jobs:
+  - job: SmokeTests
+    displayName: 'Smoke Tests on Green'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Run Smoke Tests'
+      inputs:
+        azureSubscription: 'Azure-Subscription'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          # Get green pod IP
+          GREEN_POD=$(kubectl get pods -l version=green -o jsonpath='{.items[0].metadata.name}')
+
+          # Port forward to green pod
+          kubectl port-forward $GREEN_POD 8002:3002 &
+          PF_PID=$!
+          sleep 5
+
+          # Health check
+          HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8002/health)
+
+          if [ "$HEALTH_STATUS" != "200" ]; then
+            echo "Health check failed with status: $HEALTH_STATUS"
+            kill $PF_PID
+            exit 1
+          fi
+
+          echo "Health check passed!"
+          kill $PF_PID
+
+    - script: |
+        echo "Running additional smoke tests..."
+        # Add more smoke tests here
+      displayName: 'Additional Smoke Tests'
+
+- stage: SwapTraffic
+  displayName: 'Swap Traffic to Green'
+  dependsOn: HealthCheck
+  condition: succeeded()
+  jobs:
+  - deployment: SwapTraffic
+    displayName: 'Switch Traffic to Green'
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'manifests'
+              downloadPath: '$(System.ArtifactsDirectory)'
+
+          - task: Kubernetes@1
+            displayName: 'Update Service to Point to Green'
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: $(kubernetesServiceConnection)
+              namespace: 'default'
+              command: 'apply'
+              useConfigurationFile: true
+              configuration: '$(System.ArtifactsDirectory)/manifests/blue-green/service-green.yaml'
+
+          - script: |
+              echo "Traffic switched to green environment"
+              kubectl get svc order-service -o yaml | grep version
+            displayName: 'Verify Traffic Switch'
+
+- stage: Rollback
+  displayName: 'Rollback to Blue (Manual)'
+  dependsOn: SwapTraffic
+  condition: failed()
+  jobs:
+  - deployment: Rollback
+    displayName: 'Rollback to Blue Version'
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'manifests'
+              downloadPath: '$(System.ArtifactsDirectory)'
+
+          - task: Kubernetes@1
+            displayName: 'Rollback Service to Blue'
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: $(kubernetesServiceConnection)
+              namespace: 'default'
+              command: 'apply'
+              useConfigurationFile: true
+              configuration: '$(System.ArtifactsDirectory)/manifests/blue-green/service-blue.yaml'
+
+          - script: |
+              echo "Rolled back to blue environment"
+              kubectl get svc order-service -o yaml | grep version
+            displayName: 'Verify Rollback'
