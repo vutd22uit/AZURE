@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "Scripts for data seeding and testing",
   "scripts": {
+    "test": "node test-connection.js",
+    "seed-simple": "node seed-data-simple.js",
     "seed": "node seed-data.js",
+    "seed-large": "NUM_USERS=100000 NUM_ORDERS=500000 node seed-data.js",
     "test-performance": "bash performance-tests.sh"
   },
   "dependencies": {
