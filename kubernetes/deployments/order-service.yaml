@@ -43,36 +43,6 @@ spec:
             secretKeyRef:
               name: order-service-secrets
               key: payment-function-url
-        - name: POWERBI_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: powerbi-secrets
-              key: client-id
-        - name: POWERBI_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: powerbi-secrets
-              key: client-secret
-        - name: POWERBI_TENANT_ID
-          valueFrom:
-            secretKeyRef:
-              name: powerbi-secrets
-              key: tenant-id
-        - name: POWERBI_WORKSPACE_ID
-          valueFrom:
-            secretKeyRef:
-              name: powerbi-secrets
-              key: workspace-id
-        - name: POWERBI_REPORT_ID
-          valueFrom:
-            secretKeyRef:
-              name: powerbi-secrets
-              key: report-id
-        - name: POWERBI_DATASET_ID
-          valueFrom:
-            secretKeyRef:
-              name: powerbi-secrets
-              key: dataset-id
         resources:
           requests:
             memory: "256Mi"

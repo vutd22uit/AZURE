@@ -6,7 +6,6 @@ const morgan = require('morgan');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const cartRoutes = require('./routes/cart');
-const powerbiRoutes = require('./routes/powerbi');
 const { initDatabase } = require('./config/database');
 
 const app = express();
@@ -27,7 +26,6 @@ app.get('/health', (req, res) => {
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/cart', cartRoutes);
-app.use('/api/powerbi', powerbiRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

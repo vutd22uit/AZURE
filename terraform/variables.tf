@@ -73,14 +73,3 @@ variable "from_email" {
   default     = "noreply@ecommerce.com"
 }
 
-variable "powerbi_sku" {
-  description = "Power BI Embedded SKU (A1, A2, A3, A4, A5, A6)"
-  type        = string
-  default     = "A1"
-}
-
-variable "powerbi_admins" {
-  description = "List of Power BI administrator email addresses"
-  type        = list(string)
-  default     = []
-}

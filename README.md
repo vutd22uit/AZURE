@@ -21,7 +21,7 @@
 5. [Cấu Trúc Dự Án](#-cấu-trúc-dự-án-chi-tiết)
 6. [Hướng Dẫn Cài Đặt](#-hướng-dẫn-cài-đặt-từng-bước)
 7. [Development Local](#-development-local)
-8. [Power BI Embedded](#-power-bi-embedded-integration)
+8. [Power BI Desktop](#-power-bi-desktop-integration)
 9. [Data Pipeline Demo](#-data-pipeline-demo)
 10. [Performance & Testing](#-performance--testing)
 11. [CI/CD Pipeline](#-cicd-pipeline)
@@ -39,7 +39,7 @@
 - ✅ **Microservices Architecture** trên Kubernetes (AKS)
 - ✅ **Serverless Computing** với Azure Functions
 - ✅ **Real-time Data Pipeline** (Cosmos DB → Synapse Analytics)
-- ✅ **Business Intelligence** với Power BI Embedded
+- ✅ **Business Intelligence** với Power BI Desktop
 - ✅ **Blue-Green Deployment** cho zero-downtime
 - ✅ **Big Data**: >4GB data với 100K+ users và 500K+ orders
 - ✅ **Infrastructure as Code** với Terraform
@@ -50,7 +50,7 @@
 1. **Thu thập và Lưu trữ**: Dữ liệu từ users, products, orders
 2. **Xử lý**: ETL pipeline tự động với Azure Data Factory
 3. **Phân tích**: Data warehouse trên Synapse Analytics
-4. **Trực quan hóa**: Interactive dashboards với Power BI Embedded
+4. **Trực quan hóa**: Interactive dashboards với Power BI Desktop
 5. **Triển khai**: Production-ready trên Azure Kubernetes Service
 
 ### Điểm Rubric Đạt Được: 10/10 ⭐
@@ -77,7 +77,7 @@
 - ✅ Blue-Green deployment trên AKS
 - ✅ 2 microservices giao tiếp (Auth ↔ Order)
 - ✅ Azure Functions (Payment + Email notifications)
-- ✅ **Power BI Embedded** cho analytics realtime
+- ✅ **Power BI Desktop** cho analytics reports
 
 #### ✅ Phần 5 (2đ): Báo cáo
 - ✅ Documentation đầy đủ (README, setup guides, API docs)
@@ -101,7 +101,7 @@
 │                      FRONTEND (React SPA)                                │
 │  - Home, ProductDetail, Cart, Checkout, Login, Register, Analytics      │
 │  - Hosted on AKS with Nginx                                              │
-│  - Power BI Embedded Component                                           │
+│  - Analytics Dashboard (via Power BI Desktop)                             │
 └────────────────────────────┬────────────────────────────────────────────┘
                              │
                              ▼
@@ -118,7 +118,7 @@
 │  - User Registration     │◄────────│  - Products CRUD                 │
 │  - Login / JWT           │ Verify  │  - Orders Management             │
 │  - Token Verification    │  Token  │  - Shopping Cart                 │
-│  - PostgreSQL Database   │         │  - Power BI Token Generation     │
+│  - PostgreSQL Database   │         │  - Direct Synapse Connection     │
 └──────────┬───────────────┘         └────────┬─────────────────────────┘
            │                                   │
            ▼                                   ▼
@@ -185,7 +185,7 @@
 2. **Browse Products**: Frontend → Order Service → Cosmos DB
 3. **Create Order**: Frontend → Order Service → Cosmos DB → Payment Function → Email Function
 4. **ETL Process**: Cosmos DB → Data Factory (hourly) → Synapse Analytics
-5. **Analytics**: Power BI Service → Synapse → Frontend (Power BI Embedded)
+5. **Analytics**: Power BI Desktop → Synapse (Direct Connection)
 
 ---
 
@@ -197,7 +197,7 @@
 - **Tailwind CSS** - Styling framework
 - **Axios** - HTTP client
 - **Context API** - State management
-- **Power BI Client React** - Embedded analytics
+- **Power BI Desktop** - Standalone analytics authoring
 
 ### Backend Services
 - **Node.js 18** - Runtime
@@ -221,7 +221,7 @@
 #### Analytics & BI
 - **Azure Synapse Analytics** - Data warehouse (DW100c)
 - **Azure Data Factory** - ETL orchestration
-- **Power BI Embedded** - Embedded analytics (A1 capacity)
+- **Power BI Desktop** - Free analytics authoring tool
 
 #### Networking & Security
 - **Azure Container Registry (ACR)** - Docker image registry
@@ -272,7 +272,7 @@
 
 ### 📊 Analytics & BI Features
 
-5. **Power BI Embedded** ⭐ NEW
+5. **Power BI Desktop Integration** ⭐ UPDATED
    - ✅ Interactive dashboards embedded in application
    - ✅ Real-time data from Synapse Analytics
    - ✅ Row-Level Security (users see only their data)
@@ -312,7 +312,7 @@
 10. **Security Features**
     - ✅ HTTPS/TLS enforced
     - ✅ Kubernetes Secrets for sensitive data
-    - ✅ Azure AD authentication for Power BI
+    - ✅ Direct Synapse connection for analytics
     - ✅ Database firewall rules
     - ✅ RBAC on Azure resources
     - ✅ Helmet.js for HTTP headers security
@@ -334,10 +334,10 @@
 │   │   │   ├── Checkout.js            # Order checkout
 │   │   │   ├── Login.js               # User login
 │   │   │   ├── Register.js            # User registration
-│   │   │   └── Analytics.js           # ⭐ Power BI Embedded dashboard
+│   │   │   └── Analytics.js           # (Removed - use Power BI Desktop)
 │   │   ├── components/
 │   │   │   ├── Header.js              # Navigation header
-│   │   │   └── PowerBIEmbed.js        # ⭐ Power BI embed component
+│   │   │   └── PowerBIEmbed.js        # (Removed - use Power BI Desktop)
 │   │   ├── context/
 │   │   │   ├── AuthContext.js         # Auth state management
 │   │   │   └── CartContext.js         # Cart state management
@@ -369,12 +369,12 @@
 │   │   │   ├── productController.js   # Product CRUD
 │   │   │   ├── orderController.js     # Order management
 │   │   │   ├── cartController.js      # Cart operations
-│   │   │   └── powerbiController.js   # ⭐ Power BI embed tokens
+│   │   │   └── powerbiController.js   # (Removed - no longer needed)
 │   │   ├── routes/
 │   │   │   ├── products.js            # Product routes
 │   │   │   ├── orders.js              # Order routes
 │   │   │   ├── cart.js                # Cart routes
-│   │   │   └── powerbi.js             # ⭐ Power BI routes
+│   │   │   └── powerbi.js             # (Removed - no longer needed)
 │   │   ├── middleware/
 │   │   │   └── auth.js                # JWT verification
 │   │   ├── config/
@@ -402,7 +402,7 @@
 │   │   ├── Azure Functions
 │   │   ├── Synapse Analytics Workspace
 │   │   ├── Data Factory
-│   │   ├── Power BI Embedded Capacity  # ⭐ NEW
+│   │   ├── (Power BI Embedded removed) # ⭐ REMOVED
 │   │   ├── Container Registry (ACR)
 │   │   └── Application Insights
 │   ├── variables.tf                   # Input variables
@@ -412,7 +412,7 @@
 ├── kubernetes/                        # Kubernetes Manifests
 │   ├── deployments/
 │   │   ├── auth-service.yaml          # Auth service deployment
-│   │   ├── order-service.yaml         # Order service deployment (with Power BI env vars)
+│   │   ├── order-service.yaml         # Order service deployment
 │   │   └── frontend.yaml              # Frontend deployment
 │   ├── services/
 │   │   ├── auth-service.yaml          # Auth service ClusterIP
@@ -426,7 +426,7 @@
 │   │   ├── service-blue.yaml          # Blue service
 │   │   └── service-green.yaml         # Green service
 │   ├── secrets/
-│   │   └── powerbi-secrets.yaml.template  # ⭐ Power BI secrets template
+│   │   └── (powerbi-secrets removed)      # ⭐ No longer needed
 │   └── README.md
 │
 ├── ci-cd/                             # CI/CD Pipeline
@@ -452,8 +452,8 @@
 │
 ├── powerbi/                           # Power BI Documentation
 │   ├── README.md                      # Power BI reports overview
-│   ├── POWERBI_EMBEDDED_SETUP.md      # ⭐ Complete setup guide
-│   ├── QUICKSTART.md                  # ⭐ 7-minute quick start
+│   ├── POWERBI_DESKTOP_SETUP.md       # ⭐ Complete setup guide for Desktop
+│   ├── QUICKSTART.md                  # ⭐ 10-minute quick start
 │   └── reports/                       # Report definitions
 │       ├── overview-dashboard.pbix
 │       ├── order-details.pbix
@@ -481,7 +481,7 @@
 └── package.json
 ```
 
-**⭐ Denotes files added in latest update (Power BI Embedded + Data Pipeline Demo)**
+**⭐ Denotes files added/updated in latest update (Power BI Desktop + Data Pipeline Demo)**
 
 ---
 
@@ -718,19 +718,19 @@ az datafactory pipeline create-run \
   --name CosmosToSynapsePipeline
 ```
 
-### Bước 12: Setup Power BI Embedded
+### Bước 12: Setup Power BI Desktop
 
 Làm theo hướng dẫn chi tiết tại:
-- Quick Start (7 phút): `/powerbi/QUICKSTART.md`
-- Full Guide: `/powerbi/POWERBI_EMBEDDED_SETUP.md`
+- Quick Start (10 phút): `/powerbi/QUICKSTART.md`
+- Full Guide: `/powerbi/POWERBI_DESKTOP_SETUP.md`
 
 **Tóm tắt:**
-1. Create Azure AD App Registration
-2. Configure API permissions for Power BI
-3. Create Power BI workspace
-4. Publish reports to workspace
-5. Configure Kubernetes secrets
-6. Test analytics page
+1. Install Power BI Desktop (Windows only, free download)
+2. Connect to Synapse Analytics (direct SQL connection)
+3. Import tables: dw.FactOrders, dw.FactDailySales
+4. Create visualizations (cards, charts, tables)
+5. Save report locally (.pbix file)
+6. Optionally publish to Power BI Service for sharing
 
 ### Bước 13: Verify Deployment
 
@@ -744,7 +744,6 @@ EXTERNAL_IP=$(kubectl get ingress -o jsonpath='{.items[0].status.loadBalancer.in
 # Test health endpoints
 curl http://$EXTERNAL_IP/api/auth/health
 curl http://$EXTERNAL_IP/api/orders/health
-curl http://$EXTERNAL_IP/api/powerbi/health
 
 # Open in browser
 echo "Frontend: http://$EXTERNAL_IP"
@@ -798,14 +797,6 @@ AUTH_SERVICE_URL=http://localhost:3001
 
 # Payment Function URL
 PAYMENT_FUNCTION_URL=http://localhost:7071/api/process-payment
-
-# Power BI Embedded
-POWERBI_CLIENT_ID=your-azure-ad-client-id
-POWERBI_CLIENT_SECRET=your-client-secret
-POWERBI_TENANT_ID=your-tenant-id
-POWERBI_WORKSPACE_ID=your-workspace-id
-POWERBI_REPORT_ID=your-report-id
-POWERBI_DATASET_ID=your-dataset-id
 ```
 
 **frontend/.env:**
@@ -870,86 +861,130 @@ func start
 
 ---
 
-## 📊 Power BI Embedded Integration
+## 📊 Power BI Desktop Integration
 
 ### Overview
 
-Power BI Embedded cho phép nhúng interactive reports trực tiếp vào application, cho phép users xem analytics mà không cần rời khỏi app.
+Power BI Desktop là công cụ miễn phí cho phép tạo interactive analytics reports kết nối trực tiếp với Synapse Analytics. Reports có thể được xem trong Power BI Desktop hoặc publish lên Power BI Service để share với team.
+
+**Key Differences from Power BI Embedded:**
+- ✅ **FREE** - No Azure capacity costs (Power BI Embedded costs $1/hour minimum)
+- ✅ **Simpler Setup** - No Azure AD app registration or backend API needed
+- ✅ **Direct Connection** - Connect directly to Synapse without embed tokens
+- ✅ **Standalone Tool** - Desktop application for Windows
 
 ### Key Features
 
 - ✅ Real-time data from Synapse Analytics
-- ✅ Row-Level Security (RLS) - users chỉ xem data của mình
 - ✅ Interactive filters và drill-downs
-- ✅ Secure token-based authentication
-- ✅ Auto-refresh khi có data mới
+- ✅ Rich visualizations (charts, tables, maps, gauges)
+- ✅ DAX measures for advanced calculations
+- ✅ Publish to Power BI Service for sharing (optional)
 
 ### Architecture
 
 ```
-Frontend (/analytics page)
+Power BI Desktop (Windows App)
     ↓
-Request embed token from backend
+Direct SQL Connection
     ↓
-Backend (order-service/controllers/powerbiController.js)
+Azure Synapse Analytics
     ↓
-Azure AD Authentication (MSAL)
-    ↓
-Power BI REST API
-    ↓
-Generate embed token with RLS
-    ↓
-Return token + embed URL to frontend
-    ↓
-Frontend renders Power BI report (iframe)
+Data Warehouse Tables
+    ├── dw.FactOrders
+    ├── dw.FactDailySales
+    └── dw.DimDate
+    ↑
+    │ ETL Pipeline (Hourly)
+    │
+Cosmos DB (Operational Data)
 ```
 
-### Quick Setup (7 minutes)
+### Quick Setup (10 minutes)
 
 ```bash
-# 1. Create Azure AD App Registration
-az ad app create --display-name "PowerBI-Embedded-ECommerce"
+# 1. Install Power BI Desktop
+# Download from: https://www.microsoft.com/en-us/download/details.aspx?id=58494
+# Or install from Microsoft Store
 
-# 2. Configure Power BI workspace
-# See: /powerbi/QUICKSTART.md
+# 2. Get Synapse connection details
+cd terraform
+terraform output synapse_workspace_name
+# Output: ecommerce-cloud-synapse
 
-# 3. Create Kubernetes secret
-cd kubernetes/secrets
-# Edit powerbi-secrets.yaml.template
-kubectl create -f powerbi-secrets.yaml
+# 3. Open Power BI Desktop
+# - Get Data → Azure Synapse Analytics SQL
+# - Server: <workspace-name>.sql.azuresynapse.net
+# - Database: ecommercedw
+# - Auth: SQL (synapseadmin / your-password)
 
-# 4. Access analytics page
-# http://your-app.com/analytics
+# 4. Select tables to import
+# - dw.FactOrders
+# - dw.FactDailySales
+
+# 5. Create visualizations
+# - Drag and drop fields
+# - Add cards, charts, tables
+# - Save as .pbix file
 ```
 
 ### Detailed Documentation
 
-- **Quick Start**: [/powerbi/QUICKSTART.md](powerbi/QUICKSTART.md)
-- **Complete Setup**: [/powerbi/POWERBI_EMBEDDED_SETUP.md](powerbi/POWERBI_EMBEDDED_SETUP.md)
-- **API Reference**: See setup guide
+- **Quick Start (10 min)**: [/powerbi/QUICKSTART.md](powerbi/QUICKSTART.md)
+- **Complete Setup Guide**: [/powerbi/POWERBI_DESKTOP_SETUP.md](powerbi/POWERBI_DESKTOP_SETUP.md)
+- **DAX Measures & Best Practices**: See setup guide
 
-### Available Reports
+### Sample Reports You Can Create
 
 1. **Overview Dashboard**
-   - Total Revenue (today, month, year)
-   - Total Orders count
-   - Revenue trend line chart
-   - Top 5 days by revenue
+   - Total Revenue (KPI card)
+   - Total Orders count (KPI card)
+   - Average Order Value (calculated measure)
+   - Daily Revenue trend (line chart)
+   - Orders by Payment Method (pie chart)
+   - Orders by Status (bar chart)
 
-2. **Order Details Report**
-   - Filterable table of all orders
-   - Search by Order ID
-   - Filter by date range, status, payment method
+2. **Sales Analysis**
+   - Daily sales table
+   - Revenue by date range
+   - Completed vs pending orders
+   - Payment method breakdown
 
-3. **Top Products Report**
-   - Bar chart: Top 10 products by revenue
-   - Pie chart: Revenue distribution
-   - Units sold metrics
+3. **Time-Based Analysis**
+   - Revenue trends over time
+   - Peak sales periods
+   - Day-over-day comparisons
+   - Monthly/weekly aggregations
 
-4. **Category Analysis**
-   - Pie chart: Revenue by category
-   - Donut chart: Orders by category
-   - Matrix: Category breakdown
+### How to Access Data
+
+**Option 1: Import Mode (Recommended)**
+- Data is imported into Power BI Desktop
+- Faster performance
+- Scheduled refresh (if published to Power BI Service)
+
+**Option 2: DirectQuery Mode**
+- Live connection to Synapse
+- Always current data
+- Slightly slower performance
+
+### Publishing Reports (Optional)
+
+If you have Power BI Pro license ($10/user/month or 60-day free trial):
+
+```bash
+# In Power BI Desktop:
+# 1. Click "Publish" button
+# 2. Sign in to Power BI Service
+# 3. Select workspace
+# 4. Share report link with team
+```
+
+**Benefits of Publishing:**
+- Share reports with team via URL
+- Access reports from any device (web, mobile)
+- Schedule automatic data refresh
+- Create dashboards from multiple reports
 
 ---
 
@@ -1360,23 +1395,30 @@ az synapse sql pool resume \
 # Test linked services in Data Factory portal
 ```
 
-#### 4. Power BI Not Loading
+#### 4. Power BI Desktop Connection Issues
 
 ```bash
-# Check Power BI secrets
-kubectl get secret powerbi-secrets -o yaml
-
-# Test Power BI health endpoint
-curl http://your-app.com/api/powerbi/health
+# Check if Synapse SQL pool is running
+az synapse sql pool show \
+  --name ecommercedw \
+  --workspace-name ecommerce-cloud-synapse \
+  --resource-group ecommerce-cloud-rg \
+  --query "status"
 
 # Common issues:
-# - Invalid Azure AD credentials
-# - Service principal not added to workspace
-# - Report ID or workspace ID incorrect
+# - Synapse SQL pool is paused
+# - Firewall blocking your IP address
+# - Incorrect credentials
+# - Tables are empty (data pipeline hasn't run)
 ```
 
 **Solution:**
-See troubleshooting section in `/powerbi/POWERBI_EMBEDDED_SETUP.md`
+1. Resume Synapse if paused
+2. Add your IP to Synapse firewall
+3. Verify credentials match terraform outputs
+4. Run data pipeline to populate tables
+
+See full troubleshooting guide in `/powerbi/POWERBI_DESKTOP_SETUP.md`
 
 #### 5. Performance Issues
 
