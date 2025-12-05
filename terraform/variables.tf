@@ -55,9 +55,19 @@ variable "synapse_admin_username" {
 }
 
 variable "synapse_admin_password" {
-  description = "Synapse administrator password"
+  description = "Synapse administrator password (min 8 characters, must contain uppercase, lowercase, number, and special character)"
   type        = string
   sensitive   = true
+
+  validation {
+    condition     = length(var.synapse_admin_password) >= 8
+    error_message = "Synapse administrator password must be at least 8 characters long."
+  }
+
+  validation {
+    condition     = can(regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&].{7,}$", var.synapse_admin_password))
+    error_message = "Synapse administrator password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)."
+  }
 }
 
 variable "sendgrid_api_key" {
